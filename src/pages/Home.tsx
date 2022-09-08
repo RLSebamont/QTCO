@@ -129,11 +129,16 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           {AppServices.map(serv => (
             <TouchableOpacity
               key={serv.serviceId}
+              disabled={!serv.enabled}
               onPress={() => handlePressAppService(serv)}>
               <View
                 style={[
                   styles.button,
-                  {backgroundColor: colors.card, shadowColor: colors.border},
+                  {
+                    backgroundColor: colors.card,
+                    shadowColor: colors.border,
+                    opacity: !serv.enabled ? 0.5 : 1,
+                  },
                 ]}>
                 <TText>{serv.serviceName}</TText>
               </View>
