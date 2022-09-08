@@ -5,3 +5,4 @@ export {default as Finpack} from './Finpack';
 export {default as Home} from './Home';
 export {default as Learning} from './Learning';
 export {default as Salesline} from './Salesline';
+export {default as Login} from './Login';

@@ -1,25 +1,21 @@
 import {
   View,
-  Text,
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Dimensions,
   StyleSheet,
-  Alert,
   Platform,
   Linking,
+  Alert,
+  Modal,
 } from 'react-native';
-import React, {FC, useState} from 'react';
+import React, {FC, useContext, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AppService, RootStackParamList} from '../../types';
-import Auth0 from 'react-native-auth0';
 import {useTheme} from '@react-navigation/native';
 import TText from '../components/TText';
-const auth0 = new Auth0({
-  domain: 'sebamont.au.auth0.com',
-  clientId: '0tkH6dKAotW1pUTWCKikCtrG5SVegKac',
-});
+import {AuthContext} from '../utils/AuthContext';
 
 const {width: screenW} = Dimensions.get('window');
 
@@ -68,8 +64,8 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
   navigation,
 }) => {
   const {colors} = useTheme();
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [accessToken, setAccessToken] = useState<null | string>(null);
+  const [showAccessTokenModal, setShowAccessTokenModal] = useState(false);
+  const authContext = useContext(AuthContext);
 
   const handlePressAppService = async (serv: AppService) => {
     if (Platform.OS === 'android' && serv.androidUrl) {
@@ -87,41 +83,35 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
         await Linking.openURL(serv.serviceUrl);
       }
     } else {
+      // @ts-ignore
       return navigation.navigate(serv.serviceName);
     }
   };
 
-  const handlePressLogIn = () => {
-    if (loggedIn) {
-      auth0.webAuth
+  const handleLogout = () => {
+    if (authContext) {
+      authContext.auth0.webAuth
         .clearSession({})
         .then(() => {
           Alert.alert('Logged out!');
-          setAccessToken(null);
-          setLoggedIn(false);
+          authContext.setAccessToken(null);
         })
         .catch(() => {
+          Alert.alert('There was a problem logging out!');
+          authContext.setAccessToken(null);
           console.log('Log out cancelled');
         });
-    } else {
-      auth0.webAuth
-        .authorize({scope: 'openid profile email'})
-        .then(credentials => {
-          // Successfully authenticated
-          // Store the accessToken
-          setAccessToken(credentials.accessToken);
-          setLoggedIn(true);
-        })
-        .catch(error => console.log(error));
     }
   };
+
+  const handleShowAccessToken = () => {
+    setShowAccessTokenModal(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <TText>Quantaco</TText>
       <TText>Good morning Jane</TText>
-      <TouchableOpacity onPress={handlePressLogIn}>
-        <TText>{loggedIn ? 'Log out' : 'Log In'}</TText>
-      </TouchableOpacity>
       <View style={styles.buttonContainer}>
         <ScrollView
           contentContainerStyle={styles.buttonSection}
@@ -144,8 +134,57 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
               </View>
             </TouchableOpacity>
           ))}
+          <TouchableOpacity onPress={handleShowAccessToken}>
+            <View
+              style={[
+                styles.button,
+                {
+                  backgroundColor: colors.card,
+                  shadowColor: colors.border,
+                },
+              ]}>
+              <TText>Show access token</TText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout}>
+            <View
+              style={[
+                styles.button,
+                {
+                  backgroundColor: colors.card,
+                  shadowColor: colors.border,
+                },
+              ]}>
+              <TText>Logout</TText>
+            </View>
+          </TouchableOpacity>
         </ScrollView>
       </View>
+      {authContext?.accessToken && (
+        <Modal
+          animationType="slide"
+          transparent
+          visible={showAccessTokenModal}
+          onRequestClose={() => setShowAccessTokenModal(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalView}>
+              <TText>{authContext.accessToken}</TText>
+              <TouchableOpacity onPress={() => setShowAccessTokenModal(false)}>
+                <View
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: colors.card,
+                      shadowColor: colors.border,
+                    },
+                  ]}>
+                  <TText>Close Modal</TText>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 };
@@ -176,6 +215,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: '#222',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 

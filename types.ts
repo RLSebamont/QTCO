@@ -1,5 +1,6 @@
 export type RootStackParamList = {
   // add route params per screen
+  Login: undefined;
   Home: undefined;
   Benchmark: undefined;
   Cashup: undefined;
