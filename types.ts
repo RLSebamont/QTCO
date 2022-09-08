@@ -8,3 +8,12 @@ export type RootStackParamList = {
   Learning: undefined;
   Salesline: undefined;
 };
+
+export interface AppService {
+  serviceId: number;
+  serviceName: string;
+  serviceUrl: string;
+  enabled: boolean;
+  androidUrl?: string;
+  iosUrl?: string;
+}

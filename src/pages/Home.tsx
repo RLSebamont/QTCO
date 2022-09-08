@@ -7,11 +7,15 @@ import {
   Dimensions,
   StyleSheet,
   Alert,
+  Platform,
+  Linking,
 } from 'react-native';
 import React, {FC, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../types';
+import {AppService, RootStackParamList} from '../../types';
 import Auth0 from 'react-native-auth0';
+import {useTheme} from '@react-navigation/native';
+import TText from '../components/TText';
 const auth0 = new Auth0({
   domain: 'sebamont.au.auth0.com',
   clientId: '0tkH6dKAotW1pUTWCKikCtrG5SVegKac',
@@ -19,20 +23,73 @@ const auth0 = new Auth0({
 
 const {width: screenW} = Dimensions.get('window');
 
-const Services = [
-  'Salesline',
-  'Cashup',
-  'Learning',
-  'Comply',
-  'Benchmark',
-  'Finpack',
+const AppServices: AppService[] = [
+  {
+    serviceId: 1,
+    serviceName: 'Salesline',
+    serviceUrl: 'http://salesline.quantaco.co',
+    enabled: true,
+  },
+  {
+    serviceId: 2,
+    serviceName: 'Cashup',
+    serviceUrl: 'http://cashup.quantaco.co',
+    enabled: true,
+  },
+  {
+    serviceId: 3,
+    serviceName: 'Compliance',
+    serviceUrl: 'http://compliance.quantaco.co',
+    enabled: true,
+  },
+  {
+    serviceId: 4,
+    serviceName: 'Hospitality Platform',
+    serviceUrl: 'http://compliance.quantaco.co',
+    enabled: false,
+  },
+  {
+    serviceId: 5,
+    serviceName: 'Slack (Android)',
+    serviceUrl: 'https://slack.com',
+    enabled: true,
+    androidUrl: 'slack://open',
+  },
+  {
+    serviceId: 6,
+    serviceName: 'Send Mail (ios)',
+    serviceUrl: 'https://gmail.com',
+    enabled: true,
+    iosUrl: 'mailto:example@quantaco.co',
+  },
 ];
 
 const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
   navigation,
 }) => {
+  const {colors} = useTheme();
   const [loggedIn, setLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState<null | string>(null);
+
+  const handlePressAppService = async (serv: AppService) => {
+    if (Platform.OS === 'android' && serv.androidUrl) {
+      try {
+        await Linking.openURL(serv.androidUrl);
+      } catch (error) {
+        console.log(error);
+        await Linking.openURL(serv.serviceUrl);
+      }
+    } else if (Platform.OS === 'ios' && serv.iosUrl) {
+      try {
+        await Linking.openURL(serv.iosUrl);
+      } catch (error) {
+        console.log(error);
+        await Linking.openURL(serv.serviceUrl);
+      }
+    } else {
+      return navigation.navigate(serv.serviceName);
+    }
+  };
 
   const handlePressLogIn = () => {
     if (loggedIn) {
@@ -60,19 +117,25 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Quantaco</Text>
-      <Text>Good morning Jane</Text>
+      <TText>Quantaco</TText>
+      <TText>Good morning Jane</TText>
       <TouchableOpacity onPress={handlePressLogIn}>
-        <Text>{loggedIn ? 'Log out' : 'Log In'}</Text>
+        <TText>{loggedIn ? 'Log out' : 'Log In'}</TText>
       </TouchableOpacity>
       <View style={styles.buttonContainer}>
-        <ScrollView contentContainerStyle={styles.buttonSection}>
-          {Services.map(serv => (
+        <ScrollView
+          contentContainerStyle={styles.buttonSection}
+          bounces={false}>
+          {AppServices.map(serv => (
             <TouchableOpacity
-              key={serv}
-              onPress={() => navigation.navigate(serv)}>
-              <View style={styles.button}>
-                <Text>{serv}</Text>
+              key={serv.serviceId}
+              onPress={() => handlePressAppService(serv)}>
+              <View
+                style={[
+                  styles.button,
+                  {backgroundColor: colors.card, shadowColor: colors.border},
+                ]}>
+                <TText>{serv.serviceName}</TText>
               </View>
             </TouchableOpacity>
           ))}
@@ -100,7 +163,6 @@ const styles = StyleSheet.create({
     width: screenW * 0.4,
     marginVertical: 4,
     height: 40,
-    backgroundColor: '#CCC',
     elevation: 3,
     shadowColor: '#000',
     shadowOpacity: 0.26,

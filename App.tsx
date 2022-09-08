@@ -1,15 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
 import React from 'react';
-import {LinkingOptions, NavigationContainer} from '@react-navigation/native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  LinkingOptions,
+  NavigationContainer,
+} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   Benchmark,
@@ -21,7 +16,7 @@ import {
   Salesline,
 } from './src/pages';
 import {RootStackParamList} from './types';
-import {Text} from 'react-native';
+import {StatusBar, Text, useColorScheme} from 'react-native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -44,8 +39,16 @@ const linking: LinkingOptions<RootStackParamList> = {
 };
 
 const App = () => {
+  const colorScheme = useColorScheme();
   return (
-    <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
+    <NavigationContainer
+      linking={linking}
+      fallback={<Text>Loading...</Text>}
+      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <StatusBar
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+      />
+
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Home"
