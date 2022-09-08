@@ -91,7 +91,7 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
   const handleLogout = () => {
     if (authContext) {
       authContext.auth0.webAuth
-        .clearSession({})
+        .clearSession()
         .then(() => {
           Alert.alert('Logged out!');
           authContext.setAccessToken(null);
