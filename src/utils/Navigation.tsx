@@ -51,8 +51,10 @@ const Navigation = () => {
       fallback={<Text>Loading...</Text>}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack.Navigator
-        initialRouteName={authContext?.accessToken ? 'Home' : 'Login'}>
-        {authContext?.accessToken ? (
+        initialRouteName={
+          authContext?.credentials?.accessToken ? 'Home' : 'Login'
+        }>
+        {authContext?.credentials?.accessToken ? (
           <>
             <Stack.Screen
               name="Home"
@@ -67,7 +69,11 @@ const Navigation = () => {
             <Stack.Screen name="Salesline" component={Salesline} />
           </>
         ) : (
-          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{headerShown: false}}
+          />
         )}
       </Stack.Navigator>
     </NavigationContainer>

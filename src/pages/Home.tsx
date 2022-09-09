@@ -10,12 +10,14 @@ import {
   Alert,
   Modal,
 } from 'react-native';
-import React, {FC, useContext, useState} from 'react';
+import React, {FC, useContext, useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AppService, RootStackParamList} from '../../types';
 import {useTheme} from '@react-navigation/native';
 import TText from '../components/TText';
 import {AuthContext} from '../utils/AuthContext';
+import {UserInfo} from 'react-native-auth0';
+import SvgQuantacoLogo from '../components/QuantacoLogo';
 
 const {width: screenW} = Dimensions.get('window');
 
@@ -66,6 +68,28 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
   const {colors} = useTheme();
   const [showAccessTokenModal, setShowAccessTokenModal] = useState(false);
   const authContext = useContext(AuthContext);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        if (authContext?.auth0 && authContext.credentials?.accessToken) {
+          console.log('triggered getUserInfo');
+          const profile = await authContext.auth0.auth.userInfo({
+            token: authContext.credentials.accessToken,
+          });
+          console.log(profile);
+          setUserInfo(profile);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (authContext) {
+      getUserInfo();
+    }
+  }, [authContext]);
 
   const handlePressAppService = async (serv: AppService) => {
     if (Platform.OS === 'android' && serv.androidUrl) {
@@ -90,15 +114,18 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
 
   const handleLogout = () => {
     if (authContext) {
+      // console.log(
+      //   authContext.auth0.auth.logoutUrl({federated: true, returnTo: 'Home'}),
+      // );
       authContext.auth0.webAuth
         .clearSession()
         .then(() => {
           Alert.alert('Logged out!');
-          authContext.setAccessToken(null);
+          authContext.setCredentials(null);
         })
         .catch(() => {
           Alert.alert('There was a problem logging out!');
-          authContext.setAccessToken(null);
+          authContext.setCredentials(null);
           console.log('Log out cancelled');
         });
     }
@@ -110,8 +137,23 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
 
   return (
     <SafeAreaView style={styles.container}>
-      <TText>Quantaco</TText>
-      <TText>Good morning Jane</TText>
+      <View
+        style={{
+          height: 30,
+          width: '100%',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}>
+        <SvgQuantacoLogo
+          height={60}
+          width={'100%'}
+          viewBox="0 0 500 140"
+          letterColor={colors.text}
+          dotColor="#FF6A14"
+        />
+      </View>
+      <TText>{`Good morning ${userInfo?.nickname}`}</TText>
       <View style={styles.buttonContainer}>
         <ScrollView
           contentContainerStyle={styles.buttonSection}
@@ -160,7 +202,7 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           </TouchableOpacity>
         </ScrollView>
       </View>
-      {authContext?.accessToken && (
+      {authContext?.credentials?.accessToken && (
         <Modal
           animationType="slide"
           transparent
@@ -168,7 +210,7 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           onRequestClose={() => setShowAccessTokenModal(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalView}>
-              <TText>{authContext.accessToken}</TText>
+              <TText>{authContext.credentials.accessToken}</TText>
               <TouchableOpacity onPress={() => setShowAccessTokenModal(false)}>
                 <View
                   style={[
@@ -224,10 +266,10 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: '#222',
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
+    backgroundColor: '#ccc',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

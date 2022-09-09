@@ -6,12 +6,12 @@ import React, {
   SetStateAction,
   useState,
 } from 'react';
-import Auth0 from 'react-native-auth0';
+import Auth0, {Credentials} from 'react-native-auth0';
 
 interface AuthContextValues {
   auth0: Auth0;
-  accessToken: string | null;
-  setAccessToken: Dispatch<SetStateAction<string | null>>;
+  credentials: Credentials | null;
+  setCredentials: Dispatch<SetStateAction<Credentials | null>>;
 }
 
 export const AuthContext = createContext<AuthContextValues | null>(null);
@@ -28,13 +28,13 @@ const auth0 = new Auth0({
 export const AuthContextProvider: FC<AuthContextProviderProps> = ({
   children,
 }) => {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [credentials, setCredentials] = useState<Credentials | null>(null);
   return (
     <AuthContext.Provider
       value={{
         auth0,
-        accessToken,
-        setAccessToken,
+        credentials,
+        setCredentials,
       }}>
       {children}
     </AuthContext.Provider>
