@@ -1,0 +1,25 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/RedHatDisplay-Bold.ttf",
+      "sha1": "d4c62f17bd50374d4796dfdfea0844701882ea96"
+    },
+    {
+      "path": "src/assets/fonts/RedHatDisplay-Italic.ttf",
+      "sha1": "56295449c835ce147a6519f0645da57a8ddcd8dd"
+    },
+    {
+      "path": "src/assets/fonts/RedHatDisplay-Light.ttf",
+      "sha1": "6bcf9928cfa278b9c44322fbedbea77592ce4bd0"
+    },
+    {
+      "path": "src/assets/fonts/RedHatDisplay-Regular.ttf",
+      "sha1": "a88bb6ead24bce67c673802676d453ad4d1a5ffd"
+    },
+    {
+      "path": "src/assets/fonts/RedHatDisplay-SemiBold.ttf",
+      "sha1": "6718a33e1f53787e1670a6a2e08519d97fcebfc2"
+    }
+  ]
+}

@@ -146,7 +146,7 @@ const Login = () => {
               shadowColor: colors.border,
             },
           ]}>
-          <Text style={{color: colors.card}}>Login</Text>
+          <Text style={{color: 'white'}}>Login</Text>
         </View>
       </TouchableOpacity>
       <TText>or</TText>
@@ -161,7 +161,7 @@ const Login = () => {
               borderColor: colors.primary,
             },
           ]}>
-          <Text>Login with webauth</Text>
+          <TText>Login with webauth</TText>
         </View>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleSocialLogin('facebook')}>
@@ -173,7 +173,7 @@ const Login = () => {
               shadowColor: colors.border,
             },
           ]}>
-          <Text style={{color: colors.card}}>Login with facebook</Text>
+          <Text style={{color: 'white'}}>Login with facebook</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => handleSocialLogin('google-oauth2')}>
@@ -185,7 +185,7 @@ const Login = () => {
               shadowColor: colors.border,
             },
           ]}>
-          <Text style={{color: colors.card}}>Login with google</Text>
+          <Text style={{color: 'white'}}>Login with google</Text>
         </View>
       </TouchableOpacity>
     </View>

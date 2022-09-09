@@ -9,6 +9,7 @@ import {
   Linking,
   Alert,
   Modal,
+  Text,
 } from 'react-native';
 import React, {FC, useContext, useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -143,7 +144,7 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           width: '100%',
           justifyContent: 'flex-start',
           alignItems: 'center',
-          marginBottom: 16,
+          marginVertical: 16,
         }}>
         <SvgQuantacoLogo
           height={60}
@@ -172,7 +173,13 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
                     opacity: !serv.enabled ? 0.5 : 1,
                   },
                 ]}>
-                <TText>{serv.serviceName}</TText>
+                <Text
+                  style={{
+                    color: colors.text,
+                    fontFamily: 'RedHatDisplay-Regular',
+                  }}>
+                  {serv.serviceName}
+                </Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -197,7 +204,13 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
                   shadowColor: colors.border,
                 },
               ]}>
-              <TText>Logout</TText>
+              <Text
+                style={{
+                  color: colors.text,
+                  fontFamily: 'RedHatDisplay-Italic',
+                }}>
+                Logout
+              </Text>
             </View>
           </TouchableOpacity>
         </ScrollView>
@@ -210,7 +223,7 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           onRequestClose={() => setShowAccessTokenModal(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalView}>
-              <TText>{authContext.credentials.accessToken}</TText>
+              <Text>{authContext.credentials.accessToken}</Text>
               <TouchableOpacity onPress={() => setShowAccessTokenModal(false)}>
                 <View
                   style={[
