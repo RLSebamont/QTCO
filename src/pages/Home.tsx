@@ -144,7 +144,8 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           width: '100%',
           justifyContent: 'flex-start',
           alignItems: 'center',
-          marginVertical: 16,
+          marginBottom: 16,
+          marginTop: 32,
         }}>
         <SvgQuantacoLogo
           height={60}

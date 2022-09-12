@@ -10,6 +10,7 @@ import {AuthContext} from '../utils/AuthContext';
 import {useTheme} from '@react-navigation/native';
 import SvgQuantacoLogo from '../components/QuantacoLogo';
 import TText from '../components/TText';
+import {COLORS} from '../utils/theme';
 
 const styles = StyleSheet.create({
   container: {
@@ -124,7 +125,11 @@ const Login = () => {
         keyboardType="email-address"
         style={[
           styles.textInput,
-          {borderColor: colors.border, backgroundColor: colors.card},
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.card,
+            color: colors.text,
+          },
         ]}
       />
       <TextInput
@@ -134,7 +139,11 @@ const Login = () => {
         autoCapitalize="none"
         style={[
           styles.textInput,
-          {borderColor: colors.border, backgroundColor: colors.card},
+          {
+            borderColor: colors.border,
+            backgroundColor: colors.card,
+            color: colors.text,
+          },
         ]}
       />
       <TouchableOpacity onPress={handleLogin}>
@@ -169,7 +178,7 @@ const Login = () => {
           style={[
             styles.button,
             {
-              backgroundColor: colors.primary,
+              backgroundColor: COLORS.facebook,
               shadowColor: colors.border,
             },
           ]}>
@@ -181,7 +190,7 @@ const Login = () => {
           style={[
             styles.button,
             {
-              backgroundColor: colors.notification,
+              backgroundColor: COLORS.google,
               shadowColor: colors.border,
             },
           ]}>

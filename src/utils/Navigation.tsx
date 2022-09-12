@@ -1,7 +1,6 @@
 import {Text, useColorScheme} from 'react-native';
 import React, {useContext} from 'react';
 import {
-  DarkTheme,
   DefaultTheme,
   LinkingOptions,
   NavigationContainer,
@@ -19,6 +18,7 @@ import {
 } from '../pages';
 import {RootStackParamList} from '../../types';
 import {AuthContext} from './AuthContext';
+import {QantacoDarkTheme} from './theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -49,7 +49,7 @@ const Navigation = () => {
     <NavigationContainer
       linking={linking}
       fallback={<Text>Loading...</Text>}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      theme={colorScheme === 'dark' ? QantacoDarkTheme : DefaultTheme}>
       <Stack.Navigator
         initialRouteName={
           authContext?.credentials?.accessToken ? 'Home' : 'Login'
