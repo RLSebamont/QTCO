@@ -1,4 +1,4 @@
-import {View, StyleSheet, TextInput, Text} from 'react-native';
+import {View, StyleSheet, TextInput, Text, Alert} from 'react-native';
 import React, {useContext, useState} from 'react';
 import {AuthContext} from '../utils/AuthContext';
 import {useTheme} from '@react-navigation/native';
@@ -6,6 +6,8 @@ import SvgQuantacoLogo from '../components/QuantacoLogo';
 import {COLORS} from '../utils/theme';
 import LoginButton from '../components/LoginButton';
 import Divider from '../components/Divider';
+
+const AUTO_LOGIN_AFTER_SIGNUP = true;
 
 const styles = StyleSheet.create({
   container: {
@@ -40,6 +42,17 @@ const styles = StyleSheet.create({
   darkButtonText: {
     color: 'white',
   },
+  signInTextSection: {
+    width: 240,
+    marginTop: 4,
+  },
+  signInText: {
+    fontFamily: 'RedHatDisplay-Regular',
+    fontSize: 12,
+  },
+  signInLink: {
+    fontFamily: 'RedHatDisplay-Bold',
+  },
 });
 
 const themedStyles = (themeColors: any) =>
@@ -54,24 +67,53 @@ const themedStyles = (themeColors: any) =>
 const Login = () => {
   const authContext = useContext(AuthContext);
   const [isSigningUp, setIsSigningUp] = useState(false);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const {colors} = useTheme();
 
-  const handleLogin = async () => {
+  const handleLoginOrRegister = async () => {
     try {
       if (authContext?.auth0) {
-        const credentials = await authContext.auth0.auth.passwordRealm({
-          username: username,
-          password: password,
-          realm: 'Username-Password-Authentication',
-          scope: 'openid profile email',
-          audience: 'https://sebamont.au.auth0.com/userinfo',
-        });
-        authContext.setCredentials(credentials);
+        if (!isSigningUp) {
+          const credentials = await authContext.auth0.auth.passwordRealm({
+            username: email,
+            password,
+            realm: 'Username-Password-Authentication',
+            scope: 'openid profile email',
+            audience: 'https://sebamont.au.auth0.com/userinfo',
+          });
+          authContext.setCredentials(credentials);
+        } else {
+          const createUserResult = await authContext.auth0.auth.createUser({
+            email,
+            password,
+            connection: 'Username-Password-Authentication',
+          });
+          if (createUserResult) {
+            if (AUTO_LOGIN_AFTER_SIGNUP) {
+              const credentials = await authContext.auth0.auth.passwordRealm({
+                username: email,
+                password,
+                realm: 'Username-Password-Authentication',
+                scope: 'openid profile email',
+                audience: 'https://sebamont.au.auth0.com/userinfo',
+              });
+              authContext.setCredentials(credentials);
+            } else {
+              setIsSigningUp(false);
+              Alert.alert(
+                'User successfully registered',
+                'Please Log in with your new credentials',
+              );
+            }
+          }
+        }
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setEmail('');
+      setPassword('');
     }
   };
 
@@ -82,10 +124,6 @@ const Login = () => {
           scope: 'openid profile email',
         });
         authContext.setCredentials(credentials);
-        const userinfo = await authContext.auth0.auth.userInfo({
-          token: credentials.idToken,
-        });
-        console.log(userinfo);
       }
     } catch (error) {
       console.log(error);
@@ -101,10 +139,6 @@ const Login = () => {
           audience: 'https://sebamont.au.auth0.com/userinfo',
         });
         authContext.setCredentials(credentials);
-        const userinfo = await authContext.auth0.auth.userInfo({
-          token: credentials.idToken,
-        });
-        console.log(userinfo);
       }
     } catch (error) {
       console.log(error);
@@ -123,34 +157,40 @@ const Login = () => {
         />
       </View>
       <TextInput
-        onChangeText={setUsername}
+        onChangeText={setEmail}
         placeholder={'Email address'}
         autoCapitalize={'none'}
+        value={email}
         keyboardType="email-address"
         style={[styles.textInput, themedStyles(colors).loginInputs]}
       />
       <TextInput
         onChangeText={setPassword}
         secureTextEntry
+        value={password}
         placeholder={'Password'}
         autoCapitalize="none"
         style={[styles.textInput, themedStyles(colors).loginInputs]}
       />
-      <LoginButton onPress={handleLogin} text="Login" />
-      <Text style={{color: colors.text, fontSize: 12}}>
-        Already have an account?
-        <Text
-          style={{color: colors.primary}}
-          onPress={() => setIsSigningUp(prev => !prev)}>
-          {' '}
-          Log in
+      <LoginButton
+        onPress={handleLoginOrRegister}
+        text={isSigningUp ? 'Sign Up' : 'Log In'}
+      />
+      <View style={styles.signInTextSection}>
+        <Text style={[styles.signInText, {color: colors.text}]}>
+          {isSigningUp ? 'Already have an account?' : "Don't have an account?"}
+          <Text
+            style={[styles.signInLink, {color: colors.primary}]}
+            onPress={() => setIsSigningUp(prev => !prev)}>
+            {isSigningUp ? ' Log In' : ' Sign Up'}
+          </Text>
         </Text>
-      </Text>
-      <Divider width={240} text="or" />
+      </View>
+      <Divider width={240} text="or" lineColor="#BBB" />
       <LoginButton
         onPress={handleLoginWebauth}
         variant="outlined"
-        text="Login with webauth"
+        text="Continue with webauth"
       />
       <LoginButton
         text="Continue with Facebook"

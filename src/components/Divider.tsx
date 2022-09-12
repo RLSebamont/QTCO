@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 16,
   },
   dividerLine: {
     position: 'absolute',
@@ -21,8 +21,9 @@ const styles = StyleSheet.create({
 interface DividerProps {
   width?: number | string;
   text?: string;
+  lineColor?: string;
 }
-const Divider: FC<DividerProps> = ({width, text}) => {
+const Divider: FC<DividerProps> = ({width, text, lineColor}) => {
   const {colors} = useTheme();
   return (
     <View style={styles.dividerContainer}>
@@ -31,7 +32,7 @@ const Divider: FC<DividerProps> = ({width, text}) => {
           styles.dividerLine,
           {
             width: width || '100%',
-            backgroundColor: colors.text,
+            backgroundColor: lineColor || colors.text,
           },
         ]}
       />
