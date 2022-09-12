@@ -1,5 +1,14 @@
-import {View, StyleSheet, TextInput, Text, Alert} from 'react-native';
-import React, {useContext, useState} from 'react';
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  Text,
+  Alert,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
+import React, {useContext, useRef, useState} from 'react';
 import {AuthContext} from '../utils/AuthContext';
 import {useTheme} from '@react-navigation/native';
 import SvgQuantacoLogo from '../components/QuantacoLogo';
@@ -70,6 +79,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const {colors} = useTheme();
+  const passwordInputRef = useRef<TextInput | null>(null);
 
   const handleLoginOrRegister = async () => {
     try {
@@ -144,65 +154,83 @@ const Login = () => {
       console.log(error);
     }
   };
+  const handleDismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  const handlePressSubmitEmailInput = () => {
+    if (passwordInputRef.current) {
+      passwordInputRef.current.focus();
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.logoContainer}>
-        <SvgQuantacoLogo
-          height={60}
-          width={'100%'}
-          viewBox="0 0 500 140"
-          letterColor={colors.text}
-          dotColor={COLORS.quantacoOrange}
+    <TouchableWithoutFeedback onPress={handleDismissKeyboard}>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+        <View style={styles.logoContainer}>
+          <SvgQuantacoLogo
+            height={60}
+            width={'100%'}
+            viewBox="0 0 500 140"
+            letterColor={colors.text}
+            dotColor={COLORS.quantacoOrange}
+          />
+        </View>
+        <TextInput
+          onChangeText={setEmail}
+          placeholder={'Email address'}
+          autoCapitalize={'none'}
+          value={email}
+          keyboardType="email-address"
+          style={[styles.textInput, themedStyles(colors).loginInputs]}
+          returnKeyType="next"
+          onSubmitEditing={handlePressSubmitEmailInput}
         />
-      </View>
-      <TextInput
-        onChangeText={setEmail}
-        placeholder={'Email address'}
-        autoCapitalize={'none'}
-        value={email}
-        keyboardType="email-address"
-        style={[styles.textInput, themedStyles(colors).loginInputs]}
-      />
-      <TextInput
-        onChangeText={setPassword}
-        secureTextEntry
-        value={password}
-        placeholder={'Password'}
-        autoCapitalize="none"
-        style={[styles.textInput, themedStyles(colors).loginInputs]}
-      />
-      <LoginButton
-        onPress={handleLoginOrRegister}
-        text={isSigningUp ? 'Sign Up' : 'Log In'}
-      />
-      <View style={styles.signInTextSection}>
-        <Text style={[styles.signInText, {color: colors.text}]}>
-          {isSigningUp ? 'Already have an account?' : "Don't have an account?"}
-          <Text
-            style={[styles.signInLink, {color: colors.primary}]}
-            onPress={() => setIsSigningUp(prev => !prev)}>
-            {isSigningUp ? ' Log In' : ' Sign Up'}
+        <TextInput
+          onChangeText={setPassword}
+          secureTextEntry
+          value={password}
+          placeholder={'Password'}
+          ref={passwordInputRef}
+          autoCapitalize="none"
+          returnKeyType="send"
+          style={[styles.textInput, themedStyles(colors).loginInputs]}
+          onSubmitEditing={handleLoginOrRegister}
+        />
+        <LoginButton
+          onPress={handleLoginOrRegister}
+          text={isSigningUp ? 'Sign Up' : 'Log In'}
+        />
+        <View style={styles.signInTextSection}>
+          <Text style={[styles.signInText, {color: colors.text}]}>
+            {isSigningUp
+              ? 'Already have an account?'
+              : "Don't have an account?"}
+            <Text
+              style={[styles.signInLink, {color: colors.primary}]}
+              onPress={() => setIsSigningUp(prev => !prev)}>
+              {isSigningUp ? ' Log In' : ' Sign Up'}
+            </Text>
           </Text>
-        </Text>
-      </View>
-      <Divider width={240} text="or" lineColor="#BBB" />
-      <LoginButton
-        onPress={handleLoginWebauth}
-        variant="outlined"
-        text="Continue with webauth"
-      />
-      <LoginButton
-        text="Continue with Facebook"
-        onPress={() => handleSocialLogin('facebook')}
-        backgroundColor={COLORS.facebook}
-      />
-      <LoginButton
-        onPress={() => handleSocialLogin('google-oauth2')}
-        text="Continue with google"
-        backgroundColor={COLORS.google}
-      />
-    </View>
+        </View>
+        <Divider width={240} text="or" lineColor="#BBB" />
+        <LoginButton
+          onPress={handleLoginWebauth}
+          variant="outlined"
+          text="Continue with webauth"
+        />
+        <LoginButton
+          text="Continue with Facebook"
+          onPress={() => handleSocialLogin('facebook')}
+          backgroundColor={COLORS.facebook}
+        />
+        <LoginButton
+          onPress={() => handleSocialLogin('google-oauth2')}
+          text="Continue with google"
+          backgroundColor={COLORS.google}
+        />
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
