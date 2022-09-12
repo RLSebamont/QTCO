@@ -1,11 +1,11 @@
-import {View, StyleSheet, TextInput} from 'react-native';
+import {View, StyleSheet, TextInput, Text} from 'react-native';
 import React, {useContext, useState} from 'react';
 import {AuthContext} from '../utils/AuthContext';
 import {useTheme} from '@react-navigation/native';
 import SvgQuantacoLogo from '../components/QuantacoLogo';
-import TText from '../components/TText';
 import {COLORS} from '../utils/theme';
 import LoginButton from '../components/LoginButton';
+import Divider from '../components/Divider';
 
 const styles = StyleSheet.create({
   container: {
@@ -53,6 +53,7 @@ const themedStyles = (themeColors: any) =>
 
 const Login = () => {
   const authContext = useContext(AuthContext);
+  const [isSigningUp, setIsSigningUp] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const {colors} = useTheme();
@@ -123,7 +124,7 @@ const Login = () => {
       </View>
       <TextInput
         onChangeText={setUsername}
-        placeholder={'Username'}
+        placeholder={'Email address'}
         autoCapitalize={'none'}
         keyboardType="email-address"
         style={[styles.textInput, themedStyles(colors).loginInputs]}
@@ -136,20 +137,29 @@ const Login = () => {
         style={[styles.textInput, themedStyles(colors).loginInputs]}
       />
       <LoginButton onPress={handleLogin} text="Login" />
-      <TText>or</TText>
+      <Text style={{color: colors.text, fontSize: 12}}>
+        Already have an account?
+        <Text
+          style={{color: colors.primary}}
+          onPress={() => setIsSigningUp(prev => !prev)}>
+          {' '}
+          Log in
+        </Text>
+      </Text>
+      <Divider width={240} text="or" />
       <LoginButton
         onPress={handleLoginWebauth}
         variant="outlined"
         text="Login with webauth"
       />
       <LoginButton
-        text="Login with Facebook"
+        text="Continue with Facebook"
         onPress={() => handleSocialLogin('facebook')}
         backgroundColor={COLORS.facebook}
       />
       <LoginButton
         onPress={() => handleSocialLogin('google-oauth2')}
-        text="Login with google"
+        text="Continue with google"
         backgroundColor={COLORS.google}
       />
     </View>
