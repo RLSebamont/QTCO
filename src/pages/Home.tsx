@@ -8,6 +8,7 @@ import {
   Alert,
   Modal,
   Text,
+  ActivityIndicator,
 } from 'react-native';
 import React, {FC, useContext, useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -20,13 +21,7 @@ import SvgQuantacoLogo from '../components/QuantacoLogo';
 import {COLORS} from '../utils/theme';
 import AppServiceButton from '../components/AppServiceButton';
 
-const AppServices: AppService[] = [
-  {
-    serviceId: 1,
-    serviceName: 'Salesline',
-    serviceUrl: 'http://salesline.quantaco.co',
-    enabled: true,
-  },
+const HardcodedAppServices: AppService[] = [
   {
     serviceId: 2,
     serviceName: 'Cashup',
@@ -38,6 +33,7 @@ const AppServices: AppService[] = [
     serviceName: 'Compliance',
     serviceUrl: 'http://compliance.quantaco.co',
     enabled: true,
+    notifications: 1,
   },
   {
     serviceId: 4,
@@ -72,6 +68,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonSection: {
     paddingTop: 20,
@@ -109,6 +107,8 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
   const [showAccessTokenModal, setShowAccessTokenModal] = useState(false);
   const authContext = useContext(AuthContext);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [appServices, setAppServices] = useState<AppService[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -131,7 +131,49 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
     }
   }, [authContext]);
 
+  useEffect(() => {
+    const fetchAppServices = async () => {
+      try {
+        const apiRes = await fetch(
+          'https://virtserver.swaggerhub.com/Quantaco/Mobile/1.0.0/appservices/',
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        );
+        const parsedRes = (await apiRes.json()) as AppService[];
+        console.log(parsedRes);
+        const servicesList = [...parsedRes, ...HardcodedAppServices];
+        setAppServices(servicesList);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchAppServices();
+  }, []);
+
+  const handleClearNotifications = async (serviceId: number) => {
+    console.log('send api call to clear notification'); // TODO
+    setAppServices(prev =>
+      prev.map(serv => {
+        if (serv.serviceId === serviceId) {
+          return {
+            ...serv,
+            notifications: 0,
+          };
+        }
+        return serv;
+      }),
+    );
+  };
+
   const handlePressAppService = async (serv: AppService) => {
+    if (serv.notifications && serv.notifications > 0) {
+      handleClearNotifications(serv.serviceId);
+    }
     if (Platform.OS === 'android' && serv.androidUrl) {
       try {
         await Linking.openURL(serv.androidUrl);
@@ -148,7 +190,9 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
       }
     } else {
       // @ts-ignore
-      return navigation.navigate(serv.serviceName);
+      return navigation.navigate(serv.serviceName, {
+        serviceUrl: serv.serviceUrl,
+      });
     }
   };
 
@@ -188,27 +232,28 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
       </View>
       <TText>{`Good morning ${userInfo?.nickname}`}</TText>
       <View style={styles.buttonContainer}>
-        <ScrollView
-          contentContainerStyle={styles.buttonSection}
-          bounces={false}>
-          {AppServices.map(serv => (
+        {loading ? (
+          <ActivityIndicator size={'large'} />
+        ) : (
+          <ScrollView
+            contentContainerStyle={styles.buttonSection}
+            bounces={false}>
+            {appServices.map(serv => (
+              <AppServiceButton
+                key={serv.serviceId}
+                onPress={() => handlePressAppService(serv)}
+                disabled={!serv.enabled}
+                text={serv.serviceName}
+                notifications={serv.notifications}
+              />
+            ))}
             <AppServiceButton
-              key={serv.serviceId}
-              onPress={() => handlePressAppService(serv)}
-              disabled={!serv.enabled}
-              text={serv.serviceName}
+              onPress={handleShowAccessToken}
+              text="Show access token"
             />
-          ))}
-          <AppServiceButton
-            onPress={handleShowAccessToken}
-            text="Show access token"
-          />
-          <AppServiceButton
-            onPress={handleLogout}
-            text="Logout"
-            notifications={10}
-          />
-        </ScrollView>
+            <AppServiceButton onPress={handleLogout} text="Logout" />
+          </ScrollView>
+        )}
       </View>
       {authContext?.credentials?.accessToken && (
         <Modal

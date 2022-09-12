@@ -48,10 +48,15 @@ const styles = StyleSheet.create({
 
 const Salesline: FC<
   NativeStackScreenProps<RootStackParamList, 'Salesline'>
-> = () => {
+> = ({route}) => {
   const [loadingUrl, setLoadingUrl] = useState(true);
   const [navState, setNavState] = useState<WebViewNavigation | null>(null);
   const navRef = useRef<WebView | null>(null);
+  const {serviceUrl} = route.params;
+
+  const getServiceUrl = () => {
+    return serviceUrl.replace('http://', 'https://');
+  };
 
   const handleGoBack = () => {
     if (navRef.current) {
@@ -110,7 +115,7 @@ const Salesline: FC<
       <View style={styles.webviewContainer}>
         <WebView
           ref={navRef}
-          source={{uri: 'https://google.com/'}}
+          source={{uri: getServiceUrl()}}
           bounces={false}
           onLoadEnd={() => setLoadingUrl(false)}
           onLoadStart={() => setLoadingUrl(true)}
