@@ -61,6 +61,47 @@ const AppServices: AppService[] = [
   },
 ];
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  logoContainer: {
+    width: '100%',
+    marginTop: 32,
+  },
+  buttonContainer: {
+    flex: 1,
+  },
+  buttonSection: {
+    paddingTop: 20,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    backgroundColor: '#ccc',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+});
+
 const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
   navigation,
 }) => {
@@ -162,7 +203,11 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
             onPress={handleShowAccessToken}
             text="Show access token"
           />
-          <AppServiceButton onPress={handleLogout} text="Logout" />
+          <AppServiceButton
+            onPress={handleLogout}
+            text="Logout"
+            notifications={10}
+          />
         </ScrollView>
       </View>
       {authContext?.credentials?.accessToken && (
@@ -185,46 +230,5 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  logoContainer: {
-    width: '100%',
-    marginTop: 32,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    flex: 1,
-  },
-  buttonSection: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-evenly',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    backgroundColor: '#ccc',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-});
 
 export default Home;
