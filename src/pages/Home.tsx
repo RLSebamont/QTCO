@@ -2,8 +2,6 @@ import {
   View,
   SafeAreaView,
   ScrollView,
-  TouchableOpacity,
-  Dimensions,
   StyleSheet,
   Platform,
   Linking,
@@ -20,8 +18,7 @@ import {AuthContext} from '../utils/AuthContext';
 import {UserInfo} from 'react-native-auth0';
 import SvgQuantacoLogo from '../components/QuantacoLogo';
 import {COLORS} from '../utils/theme';
-
-const {width: screenW} = Dimensions.get('window');
+import AppServiceButton from '../components/AppServiceButton';
 
 const AppServices: AppService[] = [
   {
@@ -139,15 +136,7 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={{
-          height: 30,
-          width: '100%',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          marginBottom: 16,
-          marginTop: 32,
-        }}>
+      <View style={styles.logoContainer}>
         <SvgQuantacoLogo
           height={60}
           width={'100%'}
@@ -162,59 +151,18 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           contentContainerStyle={styles.buttonSection}
           bounces={false}>
           {AppServices.map(serv => (
-            <TouchableOpacity
+            <AppServiceButton
               key={serv.serviceId}
+              onPress={() => handlePressAppService(serv)}
               disabled={!serv.enabled}
-              onPress={() => handlePressAppService(serv)}>
-              <View
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: colors.card,
-                    shadowColor: colors.border,
-                    opacity: !serv.enabled ? 0.5 : 1,
-                  },
-                ]}>
-                <Text
-                  style={{
-                    color: colors.text,
-                    fontFamily: 'RedHatDisplay-Regular',
-                  }}>
-                  {serv.serviceName}
-                </Text>
-              </View>
-            </TouchableOpacity>
+              text={serv.serviceName}
+            />
           ))}
-          <TouchableOpacity onPress={handleShowAccessToken}>
-            <View
-              style={[
-                styles.button,
-                {
-                  backgroundColor: colors.card,
-                  shadowColor: colors.border,
-                },
-              ]}>
-              <TText>Show access token</TText>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogout}>
-            <View
-              style={[
-                styles.button,
-                {
-                  backgroundColor: colors.card,
-                  shadowColor: colors.border,
-                },
-              ]}>
-              <Text
-                style={{
-                  color: colors.text,
-                  fontFamily: 'RedHatDisplay-Italic',
-                }}>
-                Logout
-              </Text>
-            </View>
-          </TouchableOpacity>
+          <AppServiceButton
+            onPress={handleShowAccessToken}
+            text="Show access token"
+          />
+          <AppServiceButton onPress={handleLogout} text="Logout" />
         </ScrollView>
       </View>
       {authContext?.credentials?.accessToken && (
@@ -226,18 +174,10 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           <View style={styles.modalContainer}>
             <View style={styles.modalView}>
               <Text>{authContext.credentials.accessToken}</Text>
-              <TouchableOpacity onPress={() => setShowAccessTokenModal(false)}>
-                <View
-                  style={[
-                    styles.button,
-                    {
-                      backgroundColor: colors.card,
-                      shadowColor: colors.border,
-                    },
-                  ]}>
-                  <TText>Close Modal</TText>
-                </View>
-              </TouchableOpacity>
+              <AppServiceButton
+                onPress={() => setShowAccessTokenModal(false)}
+                text="Close Modal"
+              />
             </View>
           </View>
         </Modal>
@@ -251,6 +191,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  logoContainer: {
+    width: '100%',
+    marginTop: 32,
+  },
   buttonContainer: {
     marginTop: 20,
     flex: 1,
@@ -259,19 +203,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-evenly',
-  },
-  button: {
-    width: screenW * 0.4,
-    marginVertical: 4,
-    height: 40,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.26,
-    shadowOffset: {width: 0, height: 1},
-    shadowRadius: 2,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   modalContainer: {
     flex: 1,
