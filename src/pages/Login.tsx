@@ -1,22 +1,20 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
+import {View, StyleSheet, TextInput} from 'react-native';
 import React, {useContext, useState} from 'react';
 import {AuthContext} from '../utils/AuthContext';
 import {useTheme} from '@react-navigation/native';
 import SvgQuantacoLogo from '../components/QuantacoLogo';
 import TText from '../components/TText';
 import {COLORS} from '../utils/theme';
+import LoginButton from '../components/LoginButton';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  logoContainer: {
+    width: '100%',
   },
   button: {
     width: 240,
@@ -39,7 +37,19 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
   },
+  darkButtonText: {
+    color: 'white',
+  },
 });
+
+const themedStyles = (themeColors: any) =>
+  StyleSheet.create({
+    loginInputs: {
+      borderColor: themeColors.border,
+      backgroundColor: themeColors.card,
+      color: themeColors.text,
+    },
+  });
 
 const Login = () => {
   const authContext = useContext(AuthContext);
@@ -102,20 +112,13 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          height: 30,
-          width: '100%',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}>
+      <View style={styles.logoContainer}>
         <SvgQuantacoLogo
           height={60}
           width={'100%'}
           viewBox="0 0 500 140"
           letterColor={colors.text}
-          dotColor="#FF6A14"
+          dotColor={COLORS.quantacoOrange}
         />
       </View>
       <TextInput
@@ -123,80 +126,32 @@ const Login = () => {
         placeholder={'Username'}
         autoCapitalize={'none'}
         keyboardType="email-address"
-        style={[
-          styles.textInput,
-          {
-            borderColor: colors.border,
-            backgroundColor: colors.card,
-            color: colors.text,
-          },
-        ]}
+        style={[styles.textInput, themedStyles(colors).loginInputs]}
       />
       <TextInput
         onChangeText={setPassword}
         secureTextEntry
         placeholder={'Password'}
         autoCapitalize="none"
-        style={[
-          styles.textInput,
-          {
-            borderColor: colors.border,
-            backgroundColor: colors.card,
-            color: colors.text,
-          },
-        ]}
+        style={[styles.textInput, themedStyles(colors).loginInputs]}
       />
-      <TouchableOpacity onPress={handleLogin}>
-        <View
-          style={[
-            styles.button,
-            {
-              backgroundColor: colors.primary,
-              shadowColor: colors.border,
-            },
-          ]}>
-          <Text style={{color: 'white'}}>Login</Text>
-        </View>
-      </TouchableOpacity>
+      <LoginButton onPress={handleLogin} text="Login" />
       <TText>or</TText>
-      <TouchableOpacity onPress={handleLoginWebauth}>
-        <View
-          style={[
-            styles.button,
-            {
-              backgroundColor: colors.card,
-              shadowColor: colors.border,
-              borderWidth: 2,
-              borderColor: colors.primary,
-            },
-          ]}>
-          <TText>Login with webauth</TText>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => handleSocialLogin('facebook')}>
-        <View
-          style={[
-            styles.button,
-            {
-              backgroundColor: COLORS.facebook,
-              shadowColor: colors.border,
-            },
-          ]}>
-          <Text style={{color: 'white'}}>Login with facebook</Text>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => handleSocialLogin('google-oauth2')}>
-        <View
-          style={[
-            styles.button,
-            {
-              backgroundColor: COLORS.google,
-              shadowColor: colors.border,
-            },
-          ]}>
-          <Text style={{color: 'white'}}>Login with google</Text>
-        </View>
-      </TouchableOpacity>
+      <LoginButton
+        onPress={handleLoginWebauth}
+        variant="outlined"
+        text="Login with webauth"
+      />
+      <LoginButton
+        text="Login with Facebook"
+        onPress={() => handleSocialLogin('facebook')}
+        backgroundColor={COLORS.facebook}
+      />
+      <LoginButton
+        onPress={() => handleSocialLogin('google-oauth2')}
+        text="Login with google"
+        backgroundColor={COLORS.google}
+      />
     </View>
   );
 };

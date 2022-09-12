@@ -13,4 +13,5 @@ export const QantacoDarkTheme: Theme = {
 export const COLORS = {
   google: '#DB4437',
   facebook: '#1778F2',
+  quantacoOrange: '#FF6A14',
 };

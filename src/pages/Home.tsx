@@ -19,6 +19,7 @@ import TText from '../components/TText';
 import {AuthContext} from '../utils/AuthContext';
 import {UserInfo} from 'react-native-auth0';
 import SvgQuantacoLogo from '../components/QuantacoLogo';
+import {COLORS} from '../utils/theme';
 
 const {width: screenW} = Dimensions.get('window');
 
@@ -152,7 +153,7 @@ const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({
           width={'100%'}
           viewBox="0 0 500 140"
           letterColor={colors.text}
-          dotColor="#FF6A14"
+          dotColor={COLORS.quantacoOrange}
         />
       </View>
       <TText>{`Good morning ${userInfo?.nickname}`}</TText>
